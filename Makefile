@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Werror -fpic
+CFLAGS = -Wall -Werror -g
 
 SRC = hello.c
 LIB = libhello.so
@@ -15,9 +15,7 @@ python: $(LIB)
 	python3 $(SCRIPT) ./$(LIB)
 
 $(LIB): $(SRC)
-	$(CC) $(CFLAGS) -shared -o $@ $<
+	$(CC) $(CFLAGS) -shared -o $(LIB) $(SRC)
 
 clean:
 	rm -f *.so
-
-.PHONY: all clean

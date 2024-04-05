@@ -3,9 +3,11 @@ import sys
 import ctypes
 
 def main(libraryName):
-    #url = "https://api.worldbank.org/v2/en/country/all/indicator/SI.POV.GINI?format=json&date=2011:2020&per_page=32500&page=1&country=%22Argentina%22"
-    url = "https://api.worldbank.org/v2/en/country/ARG/indicator/SI.POV.GINI?format=json&date=2011:2020&per_page=32500&page=1"
-
+    #Indice de todos los paises
+    url = "https://api.worldbank.org/v2/en/country/all/indicator/SI.POV.GINI?format=json&date=2011:2020&per_page=32500&page=1&country=%22Argentina%22"
+    #Indice de Argentina
+    #url = "https://api.worldbank.org/v2/en/country/ARG/indicator/SI.POV.GINI?format=json&date=2011:2020&per_page=32500&page=1"
+    
     resp = requests.get(url)
 
     # Verificar si la solicitud fue exitosa
@@ -17,22 +19,25 @@ def main(libraryName):
         # Imprimir un mensaje de error si la solicitud falló
         print("Error al realizar la solicitud:", resp.status_code)
         sys.exit(1)
-
+    
     # Carga la librería
     libhello = ctypes.CDLL(libraryName)
 
-    # Define los argumentos y retornos de la función
+    # Define los argumentos y retornos de la función de la librería
     libhello.hello.argtypes = ()
-    libhello.hello.restype = None
+    libhello.hello.restype = ctypes.c_int
 
     # Define un wrapper para llamar a la función de C
     def hello():
         libhello.hello()    
 
-    hello()
+    #ToDo: actualizar para la nueva función de la librería
+    #ToDo: pedir al usuario el país a filtrar
+
+    print("Retorno de la función: ",hello())
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Uso: python script_name.py library_name")
+        print("Uso: python3 main.py libraryName")
         sys.exit(1)
     main(sys.argv[1])

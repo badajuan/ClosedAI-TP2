@@ -2,10 +2,10 @@ CC = gcc
 CFLAGS = -Wall -Werror -g
 
 SRC = hello.c
-LIB = libhello.so
+LIB = libDinamica.so
 SCRIPT = main.py
 
-all: $(LIB) python showRequest
+all: $(LIB) python 
 
 showRequest:
 	@cat response.txt

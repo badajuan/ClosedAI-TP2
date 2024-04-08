@@ -6,6 +6,8 @@ int hello(){
 }
 
 //Recibe el nombre del archivo de donde sacar los datos y el nombre del país para el cual realizar los calculos
-int calculateGeany(char* requestPath, char* country){
+int calcGeany(char* requestPath, char* country){
+    //Do nothing
+    printf("    I  received '%s' and '%s'.\n",requestPath,country);
     return 0;
 }

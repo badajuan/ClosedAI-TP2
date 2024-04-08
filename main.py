@@ -3,11 +3,13 @@ import sys
 import ctypes
 
 def main(libraryName):
+    respose_path="response.txt"
+    """
     #Indice de todos los paises
     #url = "https://api.worldbank.org/v2/en/country/all/indicator/SI.POV.GINI?format=json&date=2011:2020&per_page=32500&page=1&country=%22Argentina%22"
     #Indice de Argentina
     url = "https://api.worldbank.org/v2/en/country/ARG/indicator/SI.POV.GINI?format=json&date=2011:2020&per_page=32500&page=1"
-    respose_path="response.txt"
+    
 
     resp = requests.get(url)
 
@@ -20,7 +22,7 @@ def main(libraryName):
         # Imprimir un mensaje de error si la solicitud falló
         print("Error al realizar la solicitud:", resp.status_code)
         sys.exit(1)
-    
+    """
     # Carga la librería
     library = ctypes.CDLL(libraryName)
 

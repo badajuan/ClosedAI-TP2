@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Werror -g
 
-SRC = hello.c
+SRC = library.c
 LIB = libDinamica.so
 SCRIPT = main.py
 

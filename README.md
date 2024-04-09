@@ -1,2 +1,4 @@
-# ClosedAI-TP2
-Sistemas de Computación Fcefyn UNC - 2024 
+# ClosedAI - TP2
+### Sistemas de Computación FCEFyN UNC - 2024 
+---
+

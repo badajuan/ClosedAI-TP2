@@ -22,8 +22,6 @@ def main(libraryName):
     
     #Indice de todos los paises
     url = "https://api.worldbank.org/v2/en/country/all/indicator/SI.POV.GINI?format=json&date=2011:2020&per_page=32500&page=1&country=%22Argentina%22"
-    #Indice de Argentina
-    #url = "https://api.worldbank.org/v2/en/country/ARG/indicator/SI.POV.GINI?format=json&date=2011:2020&per_page=32500&page=1"
     
     resp = requests.get(url)
 
@@ -53,23 +51,29 @@ def main(libraryName):
     root = tk.Tk()
     root.title("Evolución Indice GINI")
 
-    #Pregunta inicial + Campo para tomar la input del usuario
-    label = tk.Label(root, text="De que país desea conocer el indice GINI?:")
+    #Pregunta inicial
+    label = tk.Label(root, text="Seleccione de cual país desea analizar:")
     label.pack(pady=15)
-    entry = tk.Entry(root)
-    entry.pack(pady=5)
+    
+    # Crea un set con todos los paises encontrados en la response
+    countryList = sorted(set(entry["country"]["value"] for entry in data[1]))
 
-    # Creo un grafico en blanco y un canvas para mostrar los resultados en la ventana
+    # Utiliza el set de paises para crear una lista de selección
+    selectedCountry = tk.StringVar(root)
+    listbox = tk.Listbox(root, listvariable=selectedCountry, selectmode="browse", height=5, width=30, activestyle='underline')
+    for country in countryList:
+        listbox.insert(tk.END, country)
+    listbox.pack(pady=5, fill=tk.BOTH, expand=True, anchor='center')
+
+    # Crea un grafico en blanco y un canvas para mostrar los resultados en la ventana
     fig, ax = plt.subplots()
     canvas = FigureCanvasTkAgg(fig, master=root)
     canvas.get_tk_widget().pack()
 
     #Funcion a llamar cada vez que hay un click del usuario en el boton "Analizar"
     def showGraph():
-        #Tomo la entrada ingresada en el campo de texto
-        desiredCountry = entry.get().title()
-        message = f"Pais ingresado: {desiredCountry}. Si "
-        label.config(text=message)
+        #Toma la entrada ingresada en la lista de selección
+        desiredCountry = listbox.get(listbox.curselection()[0])
 
         years, values = filterCountry(desiredCountry)    
 
@@ -87,7 +91,6 @@ def main(libraryName):
         # Actualiza el canvas
         canvas.draw()
 
-    
     # Crea un wrapper para los botones que estarán disponibles para el usuario
     button_frame = tk.Frame(root)
     button_frame.pack()

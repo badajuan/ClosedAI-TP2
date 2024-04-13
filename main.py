@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-def main(libraryName):
+def main(libraryName, displayGUI):
 
     # Carga la librería
     library = ctypes.CDLL(libraryName)
@@ -45,14 +45,25 @@ def main(libraryName):
                 giniValues[i] = (year, floatToInt(value))
 
         giniValues.sort(key=lambda x: x[0]) # Ordenamos los años de menor a mayor
-        return zip(*giniValues)
+        return giniValues
+
+    if not displayGUI:
+        print(f"    Modo CLI activado correctamente.")
+        while True:
+            desiredCountry = input("De que país desea conocer la evolución del indice GINI? (Ingrese la palabra 'quit' para terminar la ejecución): ").title()
+            if(desiredCountry=="Quit"):
+                break
+            print(filterCountry(desiredCountry))
+        sys.exit(0)
+
+    print(f"    Desplegando interfaz gráfica...")
 
     # Crea una ventana para la GUI
     root = tk.Tk()
     root.title("Evolución Indice GINI")
 
     #Pregunta inicial
-    label = tk.Label(root, text="Seleccione de cual país desea analizar:")
+    label = tk.Label(root, text="Seleccione el país desea analizar:")
     label.pack(pady=15)
     
     # Crea un set con todos los paises encontrados en la response
@@ -75,7 +86,7 @@ def main(libraryName):
         #Toma la entrada ingresada en la lista de selección
         desiredCountry = listbox.get(listbox.curselection()[0])
 
-        years, values = filterCountry(desiredCountry)    
+        years, values = zip(*filterCountry(desiredCountry))
 
         # Limpia la info anterior (si la hay) en el grafico
         ax.clear()
@@ -84,7 +95,7 @@ def main(libraryName):
         ax.plot(years, values, marker='o')
         title = 'Evolución Indice GINI Por Año de ' + desiredCountry
         ax.set_title(title)
-        ax.set_xlabel('Años')
+        ax.set_xlabel('Año')
         ax.set_ylabel("Indice GINI")
         ax.grid(True)
 
@@ -105,7 +116,10 @@ def main(libraryName):
     root.mainloop()
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
+    if len(sys.argv) < 2:
         print("Uso: python3 main.py libraryName")
         sys.exit(1)
-    main(sys.argv[1])
+    
+    # Determina si hay que mostrar la interfaz gráfica o no segun si se incluyó el argumento '-c'
+    displayGUI = False if "-c" in sys.argv else "True"
+    main(sys.argv[1], displayGUI)

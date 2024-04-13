@@ -1,5 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Werror -g
+PYTHONFLAGS = 
 
 SRC = library.c
 LIB = libDinamica.so
@@ -12,7 +13,7 @@ showRequest:
 	@echo ''
 
 python: $(LIB)
-	python3 $(SCRIPT) ./$(LIB)
+	python3 $(SCRIPT) ./$(LIB) $(PYTHONFLAGS)
 
 $(LIB): $(SRC)
 	$(CC) $(CFLAGS) -shared -o $(LIB) $(SRC)

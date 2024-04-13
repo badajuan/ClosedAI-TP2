@@ -47,6 +47,7 @@ def main(libraryName, displayGUI):
         giniValues.sort(key=lambda x: x[0]) # Ordenamos los años de menor a mayor
         return giniValues
 
+    #Si el modo CLI fue activado
     if not displayGUI:
         print(f"    Modo CLI activado correctamente.")
         while True:
@@ -55,15 +56,17 @@ def main(libraryName, displayGUI):
                 break
             print(filterCountry(desiredCountry))
         sys.exit(0)
-
+    
+    #Si el modo GUI fue activado
     print(f"    Desplegando interfaz gráfica...")
 
     # Crea una ventana para la GUI
     root = tk.Tk()
     root.title("Evolución Indice GINI")
+    root.eval('tk::PlaceWindow . center')
 
     #Pregunta inicial
-    label = tk.Label(root, text="Seleccione el país desea analizar:")
+    label = tk.Label(root, text="Seleccione el país que desea analizar:")
     label.pack(pady=15)
     
     # Crea un set con todos los paises encontrados en la response
@@ -71,12 +74,12 @@ def main(libraryName, displayGUI):
 
     # Utiliza el set de paises para crear una lista de selección
     selectedCountry = tk.StringVar(root)
-    listbox = tk.Listbox(root, listvariable=selectedCountry, selectmode="browse", height=5, width=30, activestyle='underline')
+    listbox = tk.Listbox(root, listvariable=selectedCountry, selectmode="browse", height=5, width=10, activestyle='underline')
     for country in countryList:
         listbox.insert(tk.END, country)
     listbox.pack(pady=5, fill=tk.BOTH, expand=True, anchor='center')
 
-    # Crea un grafico en blanco y un canvas para mostrar los resultados en la ventana
+    # Crea un histograma en blanco y un canvas para mostrar los resultados en la ventana
     fig, ax = plt.subplots()
     canvas = FigureCanvasTkAgg(fig, master=root)
     canvas.get_tk_widget().pack()
@@ -88,7 +91,7 @@ def main(libraryName, displayGUI):
 
         years, values = zip(*filterCountry(desiredCountry))
 
-        # Limpia la info anterior (si la hay) en el grafico
+        # Limpia la info anterior (si la hay) del grafico
         ax.clear()
 
         # Grafica la nueva información
@@ -121,5 +124,5 @@ if __name__ == "__main__":
         sys.exit(1)
     
     # Determina si hay que mostrar la interfaz gráfica o no segun si se incluyó el argumento '-c'
-    displayGUI = False if "-c" in sys.argv else "True"
+    displayGUI = not ("-c" in sys.argv)
     main(sys.argv[1], displayGUI)

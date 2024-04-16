@@ -1,7 +1,8 @@
 CC = gcc
 CFLAGS = -Wall -Werror -g
-ASM = floatToInt
+PYTHONFLAGS = 
 
+ASM = floatToInt
 SRC = library.c
 LIB = libDinamica.so
 SCRIPT = main.py
@@ -16,7 +17,7 @@ assembler:
 	nasm -f elf64 $(ASM).asm -o $(ASM).o
 
 python: $(LIB)
-	python3 $(SCRIPT) ./$(LIB)
+	python3 $(SCRIPT) ./$(LIB) $(PYTHONFLAGS)
 
 $(LIB): $(SRC) $(ASM).o
 	$(CC) $(CFLAGS) -shared -o $(LIB) $(SRC) $(ASM).o

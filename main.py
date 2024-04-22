@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+
 def main(libraryName, displayGUI):
 
     # Carga la librería
@@ -20,24 +21,8 @@ def main(libraryName, displayGUI):
     def floatToInt(value):
         return library.floatToInt(value)
     
-    #Indice de todos los paises
-    url = "https://api.worldbank.org/v2/en/country/all/indicator/SI.POV.GINI?format=json&date=2011:2020&per_page=32500&page=1&country=%22Argentina%22"
-    
-    resp = requests.get(url)
-
-    # Verificar si la solicitud fue exitosa
-    if resp.status_code == 200:
-        print("    Request exitosa.")
-    else:
-        # Imprimir un mensaje de error si la solicitud falló
-        print("Error al realizar la solicitud:", resp.status_code)
-        sys.exit(1)
-
-    #Guarda la respuesta en un wrapper json
-    data = json.loads(resp.text)
-
     #Filtra los valores de GINI desde la request a partir del nombre del país deseado y devuelve una tupla con los años y valores encontrados
-    def filterCountry(desiredCountry):
+    def filterCountry(desiredCountry, data):
         giniValues = [(entry["date"], entry["value"]) for entry in data[1] if entry["country"]["value"] == desiredCountry]
 
         for i, (year, value) in enumerate(giniValues):
@@ -47,14 +32,97 @@ def main(libraryName, displayGUI):
         giniValues.sort(key=lambda x: x[0]) # Ordenamos los años de menor a mayor
         return giniValues
 
+    #Testeo de las funciones
+    def test1():
+    # Llama a la función con tres números flotantes diferentes
+        number_1 = 3.6
+        number_2 = -2.8
+        number_3 = 0.5
+
+        # Obtiene y muestra los resultados de la función
+        result_1 = library.floatToInt((number_1))
+        result_2 = library.floatToInt((number_2))
+        result_3 = library.floatToInt((number_3))
+
+        expected_result_1 = 5
+        expected_result_2 = -2
+        expected_result_3 = 1
+
+        print("Test 1:")
+        print(f"    Test para {number_1}: {result_1}","(Exitoso)" if result_1==expected_result_1 else "(Fallido)")
+        print(f"    Resultado para {number_2}: {result_2}","(Exitoso)" if result_2==expected_result_2 else "(Fallido)")
+        print(f"    Resultado para {number_3}: {result_3}","(Exitoso)" if result_3==expected_result_3 else "(Fallido)")
+    
+    test1()
+    
+    #Testea la función filterCountry
+    def test2():
+        # Abre el archivo con una response de ejemplo
+        with open("response.txt","r") as file:
+            testData = json.loads(file.read())
+
+        # Caso 1: Comparamos los resultados de filtrar los valores de un pais conocido en una response de ejemplo
+        desiredCountry = "Wakanda"
+        filtered_data = filterCountry(desiredCountry,testData)
+        # Se esperan estos datos para Wakanda (año, valor)
+        expected_data = [('2018', 3), ('2019', 2), ('2020', 2)]
+
+        print(f"Test 2 - Caso 1:",end="")
+        # Comparación de los resultados obtenidos con los esperados
+        if filtered_data == expected_data:
+            print(" La función filtrar país SI pasó la prueba.")
+        else:
+            print(" La función filtrar país NO pasó la prueba.")
+        
+        print("     Datos filtrados:", filtered_data)
+        print("     Datos esperados:", expected_data)
+
+        #Caso 2: Intentamos filtrar un país que sabemos que no se encuentra en la response de ejemplo
+        desiredCountry = "Narnia"
+        filtered_data = filterCountry(desiredCountry,testData)
+        # Se espera un arreglo vacío
+        expected_data = []
+
+        print(f" Test 2 - Caso 2:",end="")
+        # Comparación de los resultados obtenidos con los esperados
+        if filtered_data == expected_data:
+            print("La función filtrar país SI pasó la prueba.")
+        else:
+            print("La función filtrar país NO pasó la prueba.")
+        
+        print("     Datos filtrados:", filtered_data)
+        print("     Datos esperados:", expected_data)
+
+    test2()
+    
+    #Indice de todos los paises
+    url = "https://api.worldbank.org/v2/en/country/all/indicator/SI.POV.GINI?format=json&date=2011:2020&per_page=32500&page=1&country=%22Argentina%22"
+    
+    resp = requests.get(url)
+    
+    #Testeamos que el codigo de la respuesta sea correcta
+    def test3(resp):
+    # Verificar si la solicitud fue exitosa
+        if resp.status_code == 200:
+            print("Test 3:  Request exitosa.")
+        else:
+        # Imprimir un mensaje de error si la solicitud falló
+            print("Error al realizar la solicitud:", resp.status_code)
+            sys.exit(1)
+
+    test3(resp)
+
+    #Guarda la respuesta en un wrapper json
+    data = json.loads(resp.text)
+
     #Si el modo CLI fue activado
     if not displayGUI:
-        print(f"    Modo CLI activado correctamente.")
+        print(f"\nModo CLI activado correctamente.")
         while True:
             desiredCountry = input("De que país desea conocer la evolución del indice GINI? (Ingrese la palabra 'quit' para terminar la ejecución): ").title()
             if(desiredCountry=="Quit"):
                 break
-            print(filterCountry(desiredCountry))
+            print(filterCountry(desiredCountry,data))
         sys.exit(0)
     
     #Si el modo GUI fue activado
@@ -89,7 +157,7 @@ def main(libraryName, displayGUI):
         #Toma la entrada ingresada en la lista de selección
         desiredCountry = listbox.get(listbox.curselection()[0])
 
-        years, values = zip(*filterCountry(desiredCountry))
+        years, values = zip(*filterCountry(desiredCountry,data))
 
         # Limpia la info anterior (si la hay) del grafico
         ax.clear()
